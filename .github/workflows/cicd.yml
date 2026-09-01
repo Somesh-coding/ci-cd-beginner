@@ -17,7 +17,7 @@ steps:
   - name: Checkout repository
     uses: actions/checkout@v5
 
-  # Setup Java
+  # Setup Java 17
   - name: Set up JDK 17
     uses: actions/setup-java@v5
     with:
@@ -26,7 +26,7 @@ steps:
       cache: maven
       cache-dependency-path: cicd/pom.xml
 
-  # Build and test the Maven project
+  # Build Maven project
   - name: Build with Maven
     working-directory: ./cicd
     run: mvn -B package
@@ -37,17 +37,17 @@ steps:
       sudo apt-get update
       sudo apt-get install -y wget apt-transport-https gnupg lsb-release
 
-      wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key \
-        | gpg --dearmor \
-        | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
+      wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | \
+        gpg --dearmor | \
+        sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
 
-      echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" \
-        | sudo tee /etc/apt/sources.list.d/trivy.list
+      echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main" | \
+        sudo tee /etc/apt/sources.list.d/trivy.list
 
       sudo apt-get update
       sudo apt-get install -y trivy
 
-  # Scan filesystem for vulnerabilities
+  # Scan project filesystem with Trivy
   - name: Trivy FS Scan
     run: |
       trivy fs \
